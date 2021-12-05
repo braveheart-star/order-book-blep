@@ -7,7 +7,6 @@ export default function App() {
   const [pair, setPair] = useState("");
   const ws = useRef(null);
   const [askOrders, setAskOrders] = useState([]);
-  console.log("askOrders: ", askOrders);
   const [bidOrders, setBidOrders] = useState([]);
   let first = useRef(false);
   const url = "https://api.pro.coinbase.com";
@@ -59,22 +58,38 @@ export default function App() {
 
     let jsonMsg = JSON.stringify(msg);
     ws.current.send(jsonMsg);
-
+    let resAskOrders = [];
+    let resBidOrders = [];
     ws.current.onmessage = (e) => {
       let data = JSON.parse(e.data);
       if (data.type === "snapshot") {
-        let askOrders = data.asks.slice(0, 20).map((ask) => ({
+        resAskOrders = data.asks.slice(0, 20).map((ask) => ({
           price: parseFloat(ask[0]),
           quantity: parseFloat(ask[1]),
         }));
-        setAskOrders(askOrders);
-
-        let bidOrders = data.bids.slice(0, 20).map((bid) => ({
+        resBidOrders = data.bids.slice(0, 20).map((bid) => ({
           price: parseFloat(bid[0]),
           quantity: parseFloat(bid[1]),
         }));
-        setBidOrders(bidOrders);
+        setAskOrders([...resAskOrders]);
+
+        setBidOrders([...resBidOrders]);
       } else if (data.type === "l2update") {
+        if (data.changes[0][0] === "sell") {
+          resAskOrders.pop();
+          resAskOrders.push({
+            price: parseFloat(data.changes[0][1]),
+            quantity: parseFloat(data.changes[0][2]),
+          });
+          setAskOrders([...resAskOrders]);
+        } else if (data.changes[0][0] === "buy") {
+          resBidOrders.pop();
+          resBidOrders.push({
+            price: parseFloat(data.changes[0][1]),
+            quantity: parseFloat(data.changes[0][2]),
+          });
+          setBidOrders([...resBidOrders]);
+        }
       }
     };
   }, [pair]);
