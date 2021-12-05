@@ -16,7 +16,6 @@ const OrderBook = (props) => {
       order.cumulative = cumulative += order.quantity;
       order.maxCumulative = maxCumulative;
       order.percentage = getPercentage(cumulative);
-      console.log("order: ", order);
       return <RenderComponent key={index} {...order} />;
     });
   };

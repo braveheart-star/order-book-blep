@@ -108,6 +108,8 @@ export default function App() {
   };
   return (
     <div className="App">
+      <h1>Order Book</h1>
+      <p>Select Currency</p>
       {
         <select name="currency" value={pair} onChange={handleSelect}>
           {currencies.map((cur, idx) => {
@@ -119,7 +121,10 @@ export default function App() {
           })}
         </select>
       }
-      <OrderBook askOrders={askOrders} bidOrders={bidOrders} />
+      <div style={{ marginTop: "20px" }}>
+        <h3>Chat analysis</h3>
+        <OrderBook askOrders={askOrders} bidOrders={bidOrders} />
+      </div>
     </div>
   );
 }
